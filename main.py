@@ -1,5 +1,6 @@
 """야구 규칙 퀴즈 게임 - 실행 파일"""
 from default_data import get_default_quizzes
+from quiz import Quiz
 
 MENU_TEXT = """
 ========================================
@@ -49,6 +50,27 @@ def play_quiz(quizzes):
     return correct
 
 
+def input_text(prompt):
+    """빈 값이 아닌 문자열을 받을 때까지 다시 묻는다."""
+    while True:
+        text = input(prompt).strip()
+        if text:
+            return text
+        print("⚠ 내용을 입력해 주세요.")
+
+
+def add_quiz(quizzes):
+    """문제, 선택지 4개, 정답 번호를 입력받아 새 퀴즈를 등록한다."""
+    print("\n[퀴즈 추가]")
+    question = input_text("문제: ")
+    choices = []
+    for i in range(1, 5):
+        choices.append(input_text(f"선택지 {i}: "))
+    answer = input_number("정답 번호(1~4): ", 1, 4)
+    quizzes.append(Quiz(question, choices, answer))
+    print("✅ 퀴즈가 추가되었습니다.")
+
+
 def main():
     quizzes = get_default_quizzes()
     while True:
@@ -57,7 +79,7 @@ def main():
         if choice == 1:
             play_quiz(quizzes)
         elif choice == 2:
-            print("[퀴즈 추가] 준비 중입니다.")
+            add_quiz(quizzes)
         elif choice == 3:
             print("[퀴즈 목록] 준비 중입니다.")
         elif choice == 4:
