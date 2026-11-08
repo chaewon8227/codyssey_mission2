@@ -71,6 +71,16 @@ def add_quiz(quizzes):
     print("✅ 퀴즈가 추가되었습니다.")
 
 
+def show_quiz_list(quizzes):
+    """등록된 퀴즈의 문제 목록을 보여준다."""
+    if not quizzes:
+        print("⚠ 등록된 퀴즈가 없습니다.")
+        return
+    print(f"\n[퀴즈 목록] 총 {len(quizzes)}개")
+    for i, quiz in enumerate(quizzes, start=1):
+        print(f"  {i}. {quiz.question}")
+
+
 def main():
     quizzes = get_default_quizzes()
     while True:
@@ -81,7 +91,7 @@ def main():
         elif choice == 2:
             add_quiz(quizzes)
         elif choice == 3:
-            print("[퀴즈 목록] 준비 중입니다.")
+            show_quiz_list(quizzes)
         elif choice == 4:
             print("[점수 확인] 준비 중입니다.")
         else:
