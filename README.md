@@ -33,19 +33,52 @@ python3 main.py      # Windows는 python main.py
 - Ctrl+C, 입력 종료(EOF) → 안내 후 저장하고 안전하게 종료
 - `state.json`이 없으면 기본 퀴즈 사용, 손상되면 안내 후 기본 퀴즈로 복구
 
-## 5. 파일 구조
+## 5. 실행 화면
+
+| 화면 | 이미지 |
+|---|---|
+| 잘못된 입력 처리 (문자, 빈 입력, 범위 밖 숫자, 앞뒤 공백) | ![입력 예외](docs/img/01_input_error.png) |
+| 퀴즈 풀기 (정답/오답, 결과, 최고 점수 갱신) | ![퀴즈 풀기](docs/img/02_play.png) |
+| 퀴즈 추가 (빈 입력, 범위 밖 정답 처리 포함) | ![퀴즈 추가](docs/img/03_add.png) |
+| 재실행 후 목록·최고 점수 유지 | ![데이터 유지](docs/img/04_list_score.png) |
+| 점수 확인 (아직 기록 없음) | ![점수 없음](docs/img/05_score_empty.png) |
+| Ctrl+C 입력 시 저장 후 안전 종료 | ![Ctrl+C](docs/img/06_ctrl_c.png) |
+| 손상된 state.json 자동 복구 | ![파일 복구](docs/img/07_broken_file.png) |
+| 자동 테스트 20개 통과 | ![테스트](docs/img/08_tests.png) |
+
+## 6. 테스트
+
+```bash
+python test_quiz_game.py      # Mac은 python3
+```
+
+- Python 기본 라이브러리 `unittest`만 사용합니다. (설치 불필요)
+- 실제 `state.json`을 건드리지 않도록 임시 폴더에서 실행합니다.
+- 사용자 입력은 `unittest.mock`으로 미리 정한 값을 넣어 자동으로 검사합니다.
+
+| 테스트 묶음 | 검사 내용 |
+|---|---|
+| TestQuiz | 정답 확인, dict 변환, 잘못된 퀴즈 데이터 거부 |
+| TestInput | 공백 제거, 문자·빈 입력·범위 밖 숫자 재입력, 빈 문자열 거부 |
+| TestGameFeatures | 기본 퀴즈 로드, 풀기·최고 점수 갱신, 추가, 목록, 점수, 퀴즈 없음 처리 |
+| TestFileIO | 재실행 후 데이터 유지, UTF-8 JSON 저장, 손상 파일 복구 |
+| TestSafeExit | Ctrl+C·EOF 시 저장 후 안전 종료, 메뉴 종료 |
+
+## 7. 파일 구조
 ```
 codyssey_mission2/
 ├── main.py          # 실행 파일 (QuizGame 생성 후 실행)
 ├── quiz_game.py     # QuizGame 클래스: 메뉴, 게임 진행, 입력 처리, 저장/불러오기
 ├── quiz.py          # Quiz 클래스: 문제 1개 (출력, 정답 확인, dict 변환)
 ├── default_data.py  # 기본 퀴즈 7개
+├── test_quiz_game.py # 자동 테스트 20개
+├── docs/img/        # README 실행 화면 이미지
 ├── state.json       # 실행 시 자동 생성되는 데이터 파일
 ├── .gitignore
 └── README.md
 ```
 
-## 6. 데이터 파일 설명 (state.json)
+## 8. 데이터 파일 설명 (state.json)
 - **경로:** 프로젝트 루트 `state.json`
 - **역할:** 퀴즈 목록과 최고 점수를 저장해, 다시 실행해도 데이터가 유지되게 함
 - **인코딩:** UTF-8
