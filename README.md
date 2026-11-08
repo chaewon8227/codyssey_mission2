@@ -105,3 +105,12 @@ codyssey_mission2/
 | `answer` | int | 정답 번호 (1~4) |
 | `best_score` | int 또는 null | 최고 정답 수 (아직 안 풀었으면 null) |
 - clone 실습으로 추가한 줄
+
+
+## 9. 개발 환경
+
+| 항목 | 버전 |
+|---|---|
+| OS | Windows |
+| Python | 3.11.6 |
+| Git | 2.56.0 |
