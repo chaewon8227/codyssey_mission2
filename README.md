@@ -46,6 +46,7 @@ python3 main.py      # Windows는 python main.py
 | 손상된 state.json 복구 (백업 없음 → 기본 퀴즈) | ![파일 복구](docs/img/07_broken_file.png) |
 | 손상된 state.json 복구 (백업에서 복구, 추가 퀴즈·점수 유지) | ![백업 복구](docs/img/09_backup_restore.png) |
 | 자동 테스트 23개 통과 | ![테스트](docs/img/08_tests.png) |
+| clone·pull 실습 기록 (`git reflog` 실제 화면) | ![clone pull](docs/img/10_clone_pull.png) |
 
 ## 6. 테스트
 
@@ -226,6 +227,10 @@ git merge --no-ff feature/play-quiz    # 병합 커밋 faa2e6f 생성
 ### clone과 pull 실습
 
 > 전체 콘솔 출력: [docs/clone_pull_log.txt](docs/clone_pull_log.txt)
+
+**실습 화면 (스크린샷)**: 두 폴더에서 `git reflog`를 실행한 실제 화면입니다. 실습용 폴더는 clone → commit, 원래 폴더는 clone → pull 기록이 보입니다.
+
+![clone·pull 실습 화면](docs/img/10_clone_pull.png)
 
 원래 작업 폴더(`codyssey_mission2`) 외에 실습용 폴더(`m2_clone_test`)를 하나 더 clone했습니다.
 
