@@ -55,11 +55,17 @@ class GameTestBase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.state_path = os.path.join(self.tmp.name, "state.json")
-        self.patcher = patch.object(quiz_game, "STATE_FILE", self.state_path)
-        self.patcher.start()
+        self.backup_path = self.state_path + ".bak"
+        self.patchers = [
+            patch.object(quiz_game, "STATE_FILE", self.state_path),
+            patch.object(quiz_game, "BACKUP_FILE", self.backup_path),
+        ]
+        for p in self.patchers:
+            p.start()
 
     def tearDown(self):
-        self.patcher.stop()
+        for p in self.patchers:
+            p.stop()
         self.tmp.cleanup()
 
     def make_game(self):
@@ -171,6 +177,45 @@ class TestFileIO(GameTestBase):
             game = QuizGame()
         self.assertIn("손상", out.getvalue())
         self.assertGreaterEqual(len(game.quizzes), 5)
+
+
+class TestBackup(GameTestBase):
+    """state.json.bak 백업 생성과 백업 기반 복구 테스트"""
+
+    def test_save_creates_backup_of_previous_state(self):
+        game = self.make_game()
+        game.best_score = 3
+        game.save()                      # 첫 저장: 이전 파일이 없으므로 백업 없음
+        self.assertFalse(os.path.exists(self.backup_path))
+        game.best_score = 5
+        game.save()                      # 두 번째 저장: 직전 상태(3점)가 백업됨
+        with open(self.backup_path, encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["best_score"], 3)
+
+    def test_broken_file_restored_from_backup(self):
+        game = self.make_game()
+        run_with_inputs(game.add_quiz, ["백업 문제", "a", "b", "c", "d", "2"])
+        game.best_score = 4
+        game.save()                      # 이 시점의 상태가 다음 저장 때 백업됨
+        game.save()
+        with open(self.state_path, "w", encoding="utf-8") as f:
+            f.write("{ 망가진 파일")
+        with patch("sys.stdout", new_callable=io.StringIO) as out:
+            restored = QuizGame()
+        self.assertIn("백업 파일에서 복구", out.getvalue())
+        self.assertEqual(restored.quizzes[-1].question, "백업 문제")
+        self.assertEqual(restored.best_score, 4)
+
+    def test_broken_file_and_broken_backup_use_defaults(self):
+        for path in (self.state_path, self.backup_path):
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("{ 망가진 파일")
+        with patch("sys.stdout", new_callable=io.StringIO) as out:
+            game = QuizGame()
+        self.assertIn("기본 퀴즈 데이터로 복구", out.getvalue())
+        self.assertEqual(len(game.quizzes), 7)
+        with open(self.backup_path, encoding="utf-8") as f:
+            self.assertEqual(f.read(), "{ 망가진 파일")   # 복구 저장이 백업을 덮어쓰지 않음
 
 
 class TestSafeExit(GameTestBase):

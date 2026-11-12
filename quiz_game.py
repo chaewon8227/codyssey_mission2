@@ -1,12 +1,18 @@
 """게임 전체(메뉴, 진행, 점수)를 관리하는 QuizGame 클래스"""
 import json
 import os
+import shutil
 
 from quiz import Quiz
 from default_data import get_default_quizzes
 
 # 프로젝트 루트(이 파일이 있는 폴더)의 state.json
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state.json")
+# 저장 직전의 state.json을 복사해 두는 백업 파일
+BACKUP_FILE = STATE_FILE + ".bak"
+
+# 파일이 손상되었을 때 발생할 수 있는 오류들
+LOAD_ERRORS = (json.JSONDecodeError, KeyError, TypeError, ValueError, OSError)
 
 MENU_TEXT = """
 ========================================
@@ -28,33 +34,53 @@ class QuizGame:
 
     # ---------- 파일 저장/불러오기 ----------
     def load(self):
-        """state.json에서 퀴즈와 최고 점수를 불러온다."""
+        """state.json에서 퀴즈와 최고 점수를 불러온다.
+
+        1) 파일이 없으면(첫 실행) 기본 퀴즈를 사용한다.
+        2) 파일이 손상되었으면 백업(state.json.bak)에서 복구한다.
+        3) 백업도 없거나 손상되었으면 기본 퀴즈로 초기화한다.
+        """
         if not os.path.exists(STATE_FILE):
-            # 첫 실행: 기본 퀴즈 사용
             self.quizzes = get_default_quizzes()
             self.best_score = None
             return
         try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            self.quizzes = [Quiz.from_dict(q) for q in data["quizzes"]]
-            best = data.get("best_score")
-            if best is not None and not isinstance(best, int):
-                raise ValueError("best_score 형식 오류")
-            self.best_score = best
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError, OSError):
+            self.quizzes, self.best_score = self.read_state(STATE_FILE)
+            return
+        except LOAD_ERRORS:
+            pass
+
+        try:
+            self.quizzes, self.best_score = self.read_state(BACKUP_FILE)
+            print("⚠ 데이터 파일이 손상되었습니다. 백업 파일에서 복구합니다.")
+        except LOAD_ERRORS:
             print("⚠ 데이터 파일이 손상되었습니다. 기본 퀴즈 데이터로 복구합니다.")
             self.quizzes = get_default_quizzes()
             self.best_score = None
-            self.save()
+        self.save(make_backup=False)   # 손상된 파일을 백업으로 덮어쓰지 않도록
 
-    def save(self):
-        """현재 퀴즈와 최고 점수를 state.json에 저장한다."""
+    def read_state(self, path):
+        """JSON 파일을 읽어 (퀴즈 목록, 최고 점수)를 돌려준다. 형식이 틀리면 오류."""
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        quizzes = [Quiz.from_dict(q) for q in data["quizzes"]]
+        best = data.get("best_score")
+        if best is not None and not isinstance(best, int):
+            raise ValueError("best_score 형식 오류")
+        return quizzes, best
+
+    def save(self, make_backup=True):
+        """현재 퀴즈와 최고 점수를 state.json에 저장한다.
+
+        저장하기 전에 기존 state.json을 state.json.bak으로 복사해 둔다.
+        """
         data = {
             "quizzes": [q.to_dict() for q in self.quizzes],
             "best_score": self.best_score,
         }
         try:
+            if make_backup and os.path.exists(STATE_FILE):
+                shutil.copyfile(STATE_FILE, BACKUP_FILE)
             with open(STATE_FILE, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         except OSError as e:
