@@ -1,0 +1,84 @@
+==========================================================
+ clone / pull 실습 콘솔 출력 기록 (Windows 명령 프롬프트)
+ 실습일: 2026-11-12
+ 저장소: https://github.com/chaewon8227/codyssey_mission2
+==========================================================
+
+[실습 순서]
+1. 같은 저장소를 두 폴더에 clone
+   - codyssey_mission2 : 원래 작업 폴더
+   - m2_clone_test     : clone 실습용 폴더
+2. m2_clone_test 에서 README 한 줄 추가 -> commit -> push  (커밋 ad74caa)
+3. codyssey_mission2 에서 git pull 로 ad74caa 를 가져옴
+4. 두 폴더의 git reflog 로 clone / commit / pull 기록 확인
+
+
+----------------------------------------------------------
+[1] clone (실습용 폴더)
+----------------------------------------------------------
+C:\Users\User\codyssey>git clone https://github.com/chaewon8227/codyssey_mission2.git m2_clone_test
+Cloning into 'm2_clone_test'...
+remote: Enumerating objects: 64, done.
+remote: Counting objects: 100% (64/64), done.
+remote: Compressing objects: 100% (32/32), done.
+remote: Total 64 (delta 34), reused 61 (delta 31), pack-reused 0 (from 0)
+Receiving objects: 100% (64/64), 443.67 KiB | 15.84 MiB/s, done.
+Resolving deltas: 100% (34/34), done.
+
+
+----------------------------------------------------------
+[2] 실습용 폴더의 기록: clone 후 commit
+----------------------------------------------------------
+C:\Users\User\codyssey\m2_clone_test>git --no-pager reflog
+ad74caa (HEAD -> main, origin/main, origin/HEAD) HEAD@{0}: commit: docs: clone/pull 실습 기록
+f43e093 HEAD@{1}: clone: from https://github.com/chaewon8227/codyssey_mission2.git
+
+-> f43e093 에서 clone 한 뒤, README 한 줄을 추가해 ad74caa 를 commit 했다.
+   origin/main 도 ad74caa 를 가리키므로 push 까지 완료된 상태다.
+
+
+----------------------------------------------------------
+[3] 원래 작업 폴더의 기록: clone 후 pull
+----------------------------------------------------------
+C:\Users\User\codyssey\codyssey_mission2>git --no-pager reflog
+19016d1 (HEAD -> main, origin/main, origin/HEAD) HEAD@{0}: commit: docs: Git 작업 기록, 설계 설명, 백업 복구 설명 추가
+c7f55b3 HEAD@{1}: commit: feat: state.json 백업 생성 및 백업 기반 복구 추가
+ad74caa HEAD@{2}: pull: Fast-forward
+f43e093 HEAD@{3}: clone: from https://github.com/chaewon8227/codyssey_mission2.git
+
+-> HEAD@{3}: f43e093 에서 clone
+-> HEAD@{2}: 실습용 폴더가 push 한 ad74caa 를 git pull 로 가져옴 (Fast-forward)
+-> HEAD@{1}, HEAD@{0}: 이후 작업 커밋
+
+
+----------------------------------------------------------
+[4] 커밋 그래프와 브랜치 (2026-11-12 20:20 실행 시점, 커밋 19개)
+----------------------------------------------------------
+C:\Users\User\codyssey\codyssey_mission2>git log --oneline --graph --all
+* ad74caa (HEAD -> main, origin/main, origin/HEAD) docs: clone/pull 실습 기록
+* f43e093 docs: README에 개발 환경 추가
+* fd2d9ef chore: state.json을 Git 추적에서 제외
+* 5c2d940 docs: 실행 화면 이미지와 테스트 설명 추가
+* 32a954f test: 자동 테스트 20개 추가
+* c538fbf docs: README 마지막 줄 인코딩 수정
+* d7db25f docs: clone 실습 - README 한 줄 추가
+* 8e242d5 docs: README 작성 (개요, 주제, 실행 방법, 기능, 파일 구조, 데이터 설명)
+* f40e46d feat: state.json 저장/불러오기 및 예외 처리 (손상 복구, Ctrl+C·EOF 안전 종료)
+* 97dabb2 refactor: QuizGame 클래스로 게임 구조 정리
+* 8a4078b feat: 최고 점수 확인 및 갱신 기능 구현
+* ca63947 feat: 퀴즈 목록 보기 기능 구현
+* 263e18e feat: 퀴즈 추가 기능 구현 (입력 검증 포함)
+*   faa2e6f merge: feature/play-quiz 브랜치를 main에 병합
+|\
+| * 2f2ec60 (origin/feature/play-quiz) feat: 퀴즈 풀기 기능 구현 (출제, 정답 판정, 결과 표시)
+|/
+* 5aecf2a feat: 기본 퀴즈 데이터 7개 작성 (야구 규칙)
+* 4a1ce41 feat: Quiz 클래스 작성 (출력, 정답 확인, 변환 메서드)
+* d81eb19 feat: 메뉴 출력 및 입력 검증 기능 추가
+* c85074d chore: 초기 설정 (.gitignore, README 추가)
+
+C:\Users\User\codyssey\codyssey_mission2>git branch -a
+* main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/feature/play-quiz
+  remotes/origin/main

@@ -75,6 +75,7 @@ codyssey_mission2/
 ├── default_data.py  # 기본 퀴즈 7개
 ├── test_quiz_game.py # 자동 테스트 23개
 ├── docs/img/        # README 실행 화면 이미지
+├── docs/clone_pull_log.txt # clone·pull·커밋 그래프 콘솔 출력 기록
 ├── state.json       # 실행 시 자동 생성되는 데이터 파일 (Git 제외)
 ├── state.json.bak   # 저장 직전 상태의 백업 파일 (Git 제외)
 ├── .gitignore
@@ -180,7 +181,7 @@ JSON은 사람이 읽을 수 있고 Python의 dict·list와 바로 바뀌어서 
 * c85074d chore: 초기 설정 (.gitignore, README 추가)
 ```
 
-이 README 작성 시점 기준 커밋 19개입니다. 이후 커밋은 GitHub 저장소의 Commits 화면에서 확인할 수 있습니다.
+2026-11-12 20:20 실행 시점 기준 커밋 19개입니다. 이후 커밋은 GitHub 저장소의 Commits 화면에서 확인할 수 있습니다. 콘솔 출력 원문: [docs/clone_pull_log.txt](docs/clone_pull_log.txt)
 
 ### 커밋 규칙
 
@@ -224,10 +225,12 @@ git merge --no-ff feature/play-quiz    # 병합 커밋 faa2e6f 생성
 
 ### clone과 pull 실습
 
+> 전체 콘솔 출력: [docs/clone_pull_log.txt](docs/clone_pull_log.txt)
+
 원래 작업 폴더(`codyssey_mission2`) 외에 실습용 폴더(`m2_clone_test`)를 하나 더 clone했습니다.
 
 ```
-> git clone https://github.com/chaewon8227/codyssey_mission2.git m2_clone_test
+C:\Users\User\codyssey>git clone https://github.com/chaewon8227/codyssey_mission2.git m2_clone_test
 Cloning into 'm2_clone_test'...
 remote: Enumerating objects: 64, done.
 remote: Counting objects: 100% (64/64), done.
@@ -237,15 +240,26 @@ Receiving objects: 100% (64/64), 443.67 KiB | 15.84 MiB/s, done.
 Resolving deltas: 100% (34/34), done.
 ```
 
-실습용 폴더에서 README에 한 줄을 추가해 commit·push(`ad74caa`)한 뒤, 원래 폴더에서 `git pull`로 가져왔습니다. `git reflog`는 내 폴더에서 일어난 Git 작업을 순서대로 보여줍니다.
+실습용 폴더에서 README에 한 줄을 추가해 commit·push(`ad74caa`)한 뒤, 원래 폴더에서 `git pull`로 가져왔습니다. `git reflog`는 그 폴더에서 일어난 Git 작업을 순서대로 보여줍니다.
 
+**실습용 폴더: clone → commit**
 ```
-> git reflog          (원래 작업 폴더)
-ad74caa (HEAD -> main, origin/main, origin/HEAD) HEAD@{0}: pull: Fast-forward
+C:\Users\User\codyssey\m2_clone_test>git --no-pager reflog
+ad74caa (HEAD -> main, origin/main, origin/HEAD) HEAD@{0}: commit: docs: clone/pull 실습 기록
 f43e093 HEAD@{1}: clone: from https://github.com/chaewon8227/codyssey_mission2.git
 ```
 
+**원래 작업 폴더: clone → pull**
+```
+C:\Users\User\codyssey\codyssey_mission2>git --no-pager reflog
+19016d1 (HEAD -> main, origin/main, origin/HEAD) HEAD@{0}: commit: docs: Git 작업 기록, 설계 설명, 백업 복구 설명 추가
+c7f55b3 HEAD@{1}: commit: feat: state.json 백업 생성 및 백업 기반 복구 추가
+ad74caa HEAD@{2}: pull: Fast-forward
+f43e093 HEAD@{3}: clone: from https://github.com/chaewon8227/codyssey_mission2.git
+```
+
 - `clone: from ...`: GitHub 저장소를 복제한 기록입니다.
-- `pull: Fast-forward`: 다른 폴더에서 올린 `ad74caa`를 가져와 `f43e093`에서 `ad74caa`로 앞당긴 기록입니다.
+- `pull: Fast-forward`: 실습용 폴더에서 올린 `ad74caa`를 가져와 `f43e093`에서 `ad74caa`로 앞당긴 기록입니다.
+- 실습용 폴더의 `origin/main`이 `ad74caa`를 가리키므로 push까지 완료되었음을 알 수 있습니다.
 
 같은 실습을 첫 작업 PC에서도 한 번 했습니다. 커밋 `d7db25f`(clone 실습 - README 한 줄 추가)가 그 기록입니다.
